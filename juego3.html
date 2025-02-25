@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explora el Mapa</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+      background: #228B22;
+      width: 100vw;
+      height: 100vh;
+    }
+    .joystick-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+    }
+    /* Carita sonriente en el fondo del joystick */
+    .smiley {
+      position: absolute;
+      font-size: 24px;
+      pointer-events: none;
+      color: white;
+    }
+    .joystick {
+      width: 50px;
+      height: 50px;
+      background: gray;
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+      cursor: grab;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div class="joystick-container">
+    <div class="smiley">😊</div>
+    <div class="joystick" id="joystick"></div>
+  </div>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let player = { x: canvas.width / 2, y: canvas.height / 2, size: 40, speed: 2 };
+    let joystick = document.getElementById("joystick");
+    let isMoving = false, moveX = 0, moveY = 0;
+
+    function drawPlayer() {
+      // Dibuja un pequeño muñeco con cara sonriente
+      ctx.fillStyle = "blue";
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+      // Ojos
+      ctx.fillStyle = "white";
+      ctx.beginPath();
+      ctx.arc(player.x - 10, player.y - 10, 5, 0, Math.PI * 2);
+      ctx.arc(player.x + 10, player.y - 10, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Sonrisa
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 10, 0, Math.PI);
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawMap() {
+      ctx.fillStyle = "#228B22";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "16px Arial";
+      ctx.fillText("Designed by Nico", canvas.width - 170, canvas.height - 20);
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawMap();
+      drawPlayer();
+
+      if (isMoving) {
+        let newX = player.x + moveX * player.speed;
+        let newY = player.y + moveY * player.speed;
+        if (newX >= player.size / 2 && newX <= canvas.width - player.size / 2) player.x = newX;
+        if (newY >= player.size / 2 && newY <= canvas.height - player.size / 2) player.y = newY;
+      }
+      requestAnimationFrame(gameLoop);
+    }
+
+    function startMove() { isMoving = true; }
+
+    function move(event) {
+      let rect = joystick.parentElement.getBoundingClientRect();
+      let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+      let offsetX = clientX - rect.left - rect.width / 2;
+      let offsetY = clientY - rect.top - rect.height / 2;
+      let distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+      let maxDistance = 40;
+      if (distance > maxDistance) {
+        offsetX = (offsetX / distance) * maxDistance;
+        offsetY = (offsetY / distance) * maxDistance;
+      }
+      joystick.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      moveX = offsetX / maxDistance;
+      moveY = offsetY / maxDistance;
+    }
+
+    function stopMove() {
+      isMoving = false;
+      moveX = 0;
+      moveY = 0;
+      joystick.style.transform = "translate(0, 0)";
+    }
+
+    joystick.addEventListener("touchstart", startMove);
+    joystick.addEventListener("touchmove", move);
+    joystick.addEventListener("touchend", stopMove);
+    joystick.addEventListener("mousedown", startMove);
+    document.addEventListener("mousemove", (event) => { if (isMoving) move(event); });
+    document.addEventListener("mouseup", stopMove);
+    gameLoop();
+  </script>
+</body>
+</html>
