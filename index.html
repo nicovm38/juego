@@ -1,146 +1,325 @@
+
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Explora el Mapa</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      text-align: center;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      display: block;
-      background: #228B22;
-      width: 100vw;
-      height: 100vh;
-    }
-    .joystick-container {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 120px;
-      height: 120px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
-    }
-    /* Carita sonriente en el fondo del joystick */
-    .smiley {
-      position: absolute;
-      font-size: 24px;
-      pointer-events: none;
-      color: white;
-    }
-    .joystick {
-      width: 50px;
-      height: 50px;
-      background: gray;
-      border-radius: 50%;
-      position: relative;
-      touch-action: none;
-      cursor: grab;
-      z-index: 1;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="gameCanvas"></canvas>
-  <div class="joystick-container">
-    <div class="smiley">😊</div>
-    <div class="joystick" id="joystick"></div>
-  </div>
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let player = { x: canvas.width / 2, y: canvas.height / 2, size: 40, speed: 2 };
-    let joystick = document.getElementById("joystick");
-    let isMoving = false, moveX = 0, moveY = 0;
-
-    function drawPlayer() {
-      // Dibuja un pequeño muñeco con cara sonriente
-      ctx.fillStyle = "blue";
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, player.size / 2, 0, Math.PI * 2);
-      ctx.fill();
-      // Ojos
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.arc(player.x - 10, player.y - 10, 5, 0, Math.PI * 2);
-      ctx.arc(player.x + 10, player.y - 10, 5, 0, Math.PI * 2);
-      ctx.fill();
-      // Sonrisa
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, 10, 0, Math.PI);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-
-    function drawMap() {
-      ctx.fillStyle = "#228B22";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.font = "16px Arial";
-      ctx.fillText("Designed by Nico", canvas.width - 170, canvas.height - 20);
-    }
-
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawMap();
-      drawPlayer();
-
-      if (isMoving) {
-        let newX = player.x + moveX * player.speed;
-        let newY = player.y + moveY * player.speed;
-        if (newX >= player.size / 2 && newX <= canvas.width - player.size / 2) player.x = newX;
-        if (newY >= player.size / 2 && newY <= canvas.height - player.size / 2) player.y = newY;
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nicolás Vela Martínez - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary: #1A1F2C;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --background: #ffffff;
+        --card-bg: #ffffff;
+        --border: #e5e7eb;
       }
-      requestAnimationFrame(gameLoop);
-    }
 
-    function startMove() { isMoving = true; }
-
-    function move(event) {
-      let rect = joystick.parentElement.getBoundingClientRect();
-      let clientX = event.touches ? event.touches[0].clientX : event.clientX;
-      let clientY = event.touches ? event.touches[0].clientY : event.clientY;
-      let offsetX = clientX - rect.left - rect.width / 2;
-      let offsetY = clientY - rect.top - rect.height / 2;
-      let distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-      let maxDistance = 40;
-      if (distance > maxDistance) {
-        offsetX = (offsetX / distance) * maxDistance;
-        offsetY = (offsetY / distance) * maxDistance;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
       }
-      joystick.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-      moveX = offsetX / maxDistance;
-      moveY = offsetY / maxDistance;
-    }
 
-    function stopMove() {
-      isMoving = false;
-      moveX = 0;
-      moveY = 0;
-      joystick.style.transform = "translate(0, 0)";
-    }
+      body {
+        background: linear-gradient(to bottom, #f7f7f7, var(--background));
+        color: var(--text-primary);
+        line-height: 1.5;
+      }
 
-    joystick.addEventListener("touchstart", startMove);
-    joystick.addEventListener("touchmove", move);
-    joystick.addEventListener("touchend", stopMove);
-    joystick.addEventListener("mousedown", startMove);
-    document.addEventListener("mousemove", (event) => { if (isMoving) move(event); });
-    document.addEventListener("mouseup", stopMove);
-    gameLoop();
-  </script>
-</body>
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      /* Hero Section */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+      }
+
+      .title-small {
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+      }
+
+      .title-large {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      .subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Sections */
+      section {
+        padding: 5rem 0;
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      /* Cards */
+      .card-grid {
+        display: grid;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      .card-subtitle {
+        color: var(--text-secondary);
+      }
+
+      .card-meta {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
+      /* Contact Section */
+      .contact {
+        background: #f8f9fa;
+        text-align: center;
+        padding: 5rem 2rem;
+      }
+
+      .contact-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .contact-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .contact-link:hover {
+        color: var(--primary);
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeInUp 1s ease forwards;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .title-large {
+          font-size: 2.5rem;
+        }
+        
+        .subtitle {
+          font-size: 1rem;
+        }
+        
+        .section-title {
+          font-size: 1.5rem;
+        }
+        
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="fade-in">
+          <div class="title-small">Chief Spiritual Officer</div>
+          <h1 class="title-large">Nicolás Vela Martínez</h1>
+          <p class="subtitle">Transforming organizations through spiritual leadership and technological innovation</p>
+        </div>
+      </section>
+
+      <!-- Experience Section -->
+      <section class="container">
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          Experience
+        </h2>
+        <div class="card-grid">
+          <div class="card fade-in">
+            <h3 class="card-title">Chief Spiritual Officer</h3>
+            <p class="card-subtitle">ExamAi</p>
+            <div class="card-meta">September 2024 - Present • Sevilla, Andalucía</div>
+          </div>
+          <div class="card fade-in">
+            <h3 class="card-title">Chief Spiritual Officer</h3>
+            <p class="card-subtitle">Optimiz3D Engineering</p>
+            <div class="card-meta">September 2024 - Present • Sevilla, Andalucía</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Education Section -->
+      <section class="container">
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L12 12 2 2"></path>
+            <path d="M2 2l20 20"></path>
+            <path d="M22 22H2"></path>
+          </svg>
+          Education
+        </h2>
+        <div class="card-grid">
+          <div class="card fade-in">
+            <h3 class="card-title">Espacio RES</h3>
+            <p class="card-subtitle">Programa IMPULSE</p>
+            <div class="card-meta">September 2024 - May 2025 • Startup Acceleration</div>
+          </div>
+          <div class="card fade-in">
+            <h3 class="card-title">Y Combinator</h3>
+            <p class="card-subtitle">Startup School UK</p>
+            <div class="card-meta">November 2024 • Startup Development</div>
+          </div>
+          <div class="card fade-in">
+            <h3 class="card-title">Universidad Pablo de Olavide</h3>
+            <p class="card-subtitle">Master's in Secondary Education</p>
+            <div class="card-meta">September 2022 - June 2023 • Education</div>
+          </div>
+          <div class="card fade-in">
+            <h3 class="card-title">Universidad CEU San Pablo</h3>
+            <p class="card-subtitle">Physical Activity and Sports Science</p>
+            <div class="card-meta">Sports Science</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Certifications Section -->
+      <section class="container">
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="6"></circle>
+            <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"></path>
+          </svg>
+          Certifications & Awards
+        </h2>
+        <div class="card-grid">
+          <div class="card fade-in">
+            <p class="card-title">Foundations of Project Management</p>
+          </div>
+          <div class="card fade-in">
+            <p class="card-title">English C1 Level - Cambridge Advanced Certificate</p>
+          </div>
+          <div class="card fade-in">
+            <p class="card-title">French B1 Level - DELF Diplôme d'études en langue française</p>
+          </div>
+          <div class="card fade-in">
+            <p class="card-title">Solitoapp: Awarded attendance to Barcelona Mobile World Congress 2022</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section class="contact">
+        <h2 class="section-title" style="justify-content: center;">Get in Touch</h2>
+        <div class="contact-links">
+          <a href="mailto:nicolasvela.job@gmail.com" class="contact-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email
+          </a>
+          <a href="https://www.linkedin.com/in/nicovmz" target="_blank" rel="noopener noreferrer" class="contact-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Intersection Observer for fade-in animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      // Observe all elements with fade-in class
+      document.querySelectorAll('.fade-in').forEach(element => {
+        element.style.opacity = "0";
+        element.style.transform = "translateY(20px)";
+        element.style.transition = "all 1s ease";
+        observer.observe(element);
+      });
+    </script>
+  </body>
 </html>
